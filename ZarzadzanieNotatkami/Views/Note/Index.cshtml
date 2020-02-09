@@ -10,6 +10,18 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<div class="list-inline">
+    <p class="list-inline-item">Sort title: </p>
+    <form asp-action="SortAsc" method="post" class="list-inline-item">
+        <button class="btn btn-primary" type="submit">Sort ascending</button>
+    </form>
+
+    <form asp-action="SortDesc" method="post" class="list-inline-item">
+        <button class="btn btn-primary" type="submit">Sort descending</button>
+    </form>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -20,17 +32,18 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

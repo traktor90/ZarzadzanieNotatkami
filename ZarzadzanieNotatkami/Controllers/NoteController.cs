@@ -43,5 +43,25 @@ namespace ZarzadzanieNotatkami.Controllers
                 return View();
             }
         }
+
+        public IActionResult Details(int id)
+        {
+            Note note = context.Notes.FirstOrDefault(n => n.Id == id);
+            return View(note);
+        }
+
+        public IActionResult SortAsc()
+        {
+            IEnumerable<Note> notes = context.Notes.ToList();
+            notes = notes.OrderBy(n => n.Title);
+            return View("Index", notes);
+        }
+
+        public IActionResult SortDesc()
+        {
+            IEnumerable<Note> notes = context.Notes.ToList();
+            notes = notes.OrderByDescending(n => n.Title);
+            return View("Index", notes);
+        }
     }
 }
