@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ZarzadzanieNotatkami.Models;
 
 namespace ZarzadzanieNotatkami
 {
@@ -23,6 +25,11 @@ namespace ZarzadzanieNotatkami
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<NotesDBContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("AppConnectionString"));
+            });
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -53,7 +60,7 @@ namespace ZarzadzanieNotatkami
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Note}/{action=Index}/{id?}");
             });
         }
     }
