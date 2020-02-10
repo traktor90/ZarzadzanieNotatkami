@@ -15,5 +15,7 @@ namespace ZarzadzanieNotatkami.Models
         //max length 1 bilion characters
         [Display(Name = "Note")]
         public string Text { get; set; }
+
+        public bool Important { get; set; }
     }
 }

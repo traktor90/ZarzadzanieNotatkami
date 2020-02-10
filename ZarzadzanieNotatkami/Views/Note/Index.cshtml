@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ZarzadzanieNotatkami.Models.Note>
+﻿@model NotesViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -22,28 +22,51 @@
     </form>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@{ var headerMetaData = Model.Notes.FirstOrDefault(); }
+
+
+<form method="post" asp-action="Importants">
+    @for (int i = 0; i < Model.Notes.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.Notes[i].Id);
+        @Html.HiddenFor(model => Model.Notes[i].Text);
+        @Html.HiddenFor(model => Model.Notes[i].Title);
+    }
+    @*@Html.HiddenFor(x => x.Notes);*@
+    <table class="table table-hover table-striped">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th style="width:auto;">
+                    @Html.DisplayNameFor(model => headerMetaData.Title)
+                </th>
+                <th>Important</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Notes.Count(); i++)
+            {
+                var item = Model.Notes[i];
+
+                <tr>
+                    <td style="width:auto;">
+                        @Html.DisplayFor(modelItem => Model.Notes[i].Title)
+                    </td>
+                    <td>
+                        <input type="checkbox" asp-for="Notes[i].Important" />
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td><input type="submit" value="Send new importants" title="Updates all important fields within all records" /></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
