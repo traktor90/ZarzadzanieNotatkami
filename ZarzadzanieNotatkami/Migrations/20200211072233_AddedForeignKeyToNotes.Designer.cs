@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZarzadzanieNotatkami.Models;
 
 namespace ZarzadzanieNotatkami.Migrations
 {
     [DbContext(typeof(NotesDBContext))]
-    partial class NotesDBContextModelSnapshot : ModelSnapshot
+    [Migration("20200211072233_AddedForeignKeyToNotes")]
+    partial class AddedForeignKeyToNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,8 +31,7 @@ namespace ZarzadzanieNotatkami.Migrations
 
                     b.Property<string>("Text");
 
-                    b.Property<string>("Title")
-                        .IsRequired();
+                    b.Property<string>("Title");
 
                     b.Property<int?>("UserId");
 
@@ -47,8 +48,7 @@ namespace ZarzadzanieNotatkami.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
                     b.HasKey("Id");
 

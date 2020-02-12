@@ -17,14 +17,14 @@ namespace ZarzadzanieNotatkami.Controllers
         }
         public IActionResult Index()
         {
-            List<Note> notes;
-
-            notes = context.Notes.ToList();
+            List<Note> notes=context.Notes.ToList();
+            List<User> users = context.Users.ToList();
 
             NotesViewModel model = new NotesViewModel
             {
                 Notes = notes,
-                Importants = null
+                Importants = null,
+                Users=users
             };
             return View(model);
         }
@@ -68,10 +68,13 @@ namespace ZarzadzanieNotatkami.Controllers
         {
             List<Note> notes = context.Notes.ToList();
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
+            List<User> users = context.Users.ToList();
+
             NotesViewModel model = new NotesViewModel
             {
                 Notes = notes,
-                Importants = null
+                Importants = null,
+                Users=users
             };
             return View("Index", model);
         }
@@ -80,10 +83,13 @@ namespace ZarzadzanieNotatkami.Controllers
         {
             List<Note> notes = context.Notes.ToList();
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
+            List<User> users = context.Users.ToList();
+
             NotesViewModel model = new NotesViewModel
             {
                 Notes = notes,
-                Importants = null
+                Importants = null,
+                Users = users
             };
             return View("Index", model);
         }
@@ -93,7 +99,6 @@ namespace ZarzadzanieNotatkami.Controllers
 
             for (int i = 0; i < model.Notes.Count; i++)
             {
-                //listNotes[i] = model.Notes[i];
                 Note note = new Note
                 {
                     Id = model.Notes[i].Id,
@@ -113,6 +118,11 @@ namespace ZarzadzanieNotatkami.Controllers
                 Importants = null
             };
             return View("Index",modelToReturn);
+        }
+
+        public IActionResult CreateUser()
+        {
+            return View();
         }
     }
 }

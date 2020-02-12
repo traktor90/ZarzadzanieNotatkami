@@ -11,10 +11,12 @@ namespace ZarzadzanieNotatkami.Models
         public NotesDBContext(DbContextOptions<NotesDBContext> options): base(options) { }
         public DbSet<Note> Notes { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.EnableSensitiveDataLogging(true);
+            optionsBuilder.EnableSensitiveDataLogging(false);
         }
     }
 }

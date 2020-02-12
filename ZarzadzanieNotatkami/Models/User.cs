@@ -6,18 +6,14 @@ using System.Threading.Tasks;
 
 namespace ZarzadzanieNotatkami.Models
 {
-    public class Note
+    public class User
     {
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public string Name { get; set; }
 
-        //max length 1 bilion characters
-        [Display(Name = "Note")]
-        public string Text { get; set; }
-
-        public bool Important { get; set; }
+        public ICollection<Note> Notes { get; set; }
     }
 }

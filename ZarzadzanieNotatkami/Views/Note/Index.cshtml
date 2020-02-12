@@ -1,14 +1,32 @@
 ﻿@model NotesViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Notes Managment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+@{ 
+    var headerMetaData = Model.Notes.FirstOrDefault();
+    List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
+    {
+        return new SelectListItem
+        {
+            Text = user.Name,
+            Value = user.Id.ToString()
+        };
+    });
+}
+
+<h1>Notes Manager</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create New Note</a>
+</p>
+<p>
+    <a asp-action="Create" asp-controller="User">Create New User</a>
+</p>
+<p>
+    <a class="btn btn-dark" asp-controller="User" asp-action="Manage">Manage users</a>
 </p>
 
 <div class="list-inline">
@@ -20,10 +38,11 @@
     <form asp-action="SortDesc" method="post" class="list-inline-item">
         <button class="btn btn-primary" type="submit">Sort descending</button>
     </form>
+    <div class="list-inline-item">
+        <label asp-for="Users"></label>
+        <select asp-items="@userListItems" ></select>
+    </div>
 </div>
-
-@{ var headerMetaData = Model.Notes.FirstOrDefault(); }
-
 
 <form method="post" asp-action="Importants">
     @for (int i = 0; i < Model.Notes.Count(); i++)
@@ -32,7 +51,7 @@
         @Html.HiddenFor(model => Model.Notes[i].Text);
         @Html.HiddenFor(model => Model.Notes[i].Title);
     }
-    @*@Html.HiddenFor(x => x.Notes);*@
+
     <table class="table table-hover table-striped">
         <thead>
             <tr>
@@ -64,7 +83,7 @@
             }
             <tr>
                 <td></td>
-                <td><input type="submit" value="Send new importants" title="Updates all important fields within all records" /></td>
+                <td><input class="btn btn-dark" type="submit" value="Send new importants" title="Updates all important fields within all records" /></td>
                 <td></td>
             </tr>
         </tbody>
