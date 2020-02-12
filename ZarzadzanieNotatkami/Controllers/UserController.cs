@@ -57,5 +57,27 @@ namespace ZarzadzanieNotatkami.Controllers
             context.SaveChanges();
             return View("Manage", context.Users.ToList());
         }
+
+        public IActionResult Details(int id)
+        {
+            Models.User user = context.Users.FirstOrDefault(u => u.Id == id);
+            return View(user);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var user = context.Users.FirstOrDefault(u => u.Id == id);
+            return View(user);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(User userFromInput)
+        {
+            Models.User userFromDB = context.Users.FirstOrDefault(u => u.Id == userFromInput.Id);
+            userFromDB.Name = userFromInput.Name;
+            context.SaveChanges();
+            return View("Manage", context.Users.ToList());
+        }
     }
 }

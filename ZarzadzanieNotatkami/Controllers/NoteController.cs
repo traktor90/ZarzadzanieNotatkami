@@ -20,12 +20,7 @@ namespace ZarzadzanieNotatkami.Controllers
             List<Note> notes=context.Notes.ToList();
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = new NotesViewModel
-            {
-                Notes = notes,
-                Importants = null,
-                Users=users
-            };
+            NotesViewModel model = CreateNotesViewModelToReturn();
             return View(model);
         }
 
@@ -43,11 +38,7 @@ namespace ZarzadzanieNotatkami.Controllers
                 context.Notes.Add(note);
                 context.SaveChanges();
 
-                NotesViewModel model = new NotesViewModel
-                {
-                    Notes = context.Notes.ToList(),
-                    Importants = null
-                };
+                NotesViewModel model = CreateNotesViewModelToReturn();
                 return View("Index",model);
             }
             else
@@ -70,12 +61,7 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = new NotesViewModel
-            {
-                Notes = notes,
-                Importants = null,
-                Users=users
-            };
+            NotesViewModel model = CreateNotesViewModelToReturn();
             return View("Index", model);
         }
 
@@ -85,12 +71,7 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = new NotesViewModel
-            {
-                Notes = notes,
-                Importants = null,
-                Users = users
-            };
+            NotesViewModel model = CreateNotesViewModelToReturn();
             return View("Index", model);
         }
 
@@ -112,17 +93,60 @@ namespace ZarzadzanieNotatkami.Controllers
             context.SaveChanges();
             
             var listNotes = context.Notes.ToList();
-            NotesViewModel modelToReturn = new NotesViewModel
-            {
-                Notes = listNotes,
-                Importants = null
-            };
+            NotesViewModel modelToReturn = CreateNotesViewModelToReturn();
             return View("Index",modelToReturn);
         }
 
         public IActionResult CreateUser()
         {
             return View();
+        }
+
+        public IActionResult Delete(int id)
+        {
+            Note note = context.Notes.FirstOrDefault(n => n.Id == id);
+            context.Notes.Remove(note);
+            context.SaveChanges();
+            NotesViewModel model = CreateNotesViewModelToReturn();
+            return View("Index", model);
+        }
+
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Note note = context.Notes.FirstOrDefault(n => n.Id == id);
+            return View(note);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Note noteIn)
+        {
+            NotesViewModel model = CreateNotesViewModelToReturn();
+            if (ModelState.IsValid)
+            {
+                Note noteFromBase = context.Notes.FirstOrDefault(n => n.Id == noteIn.Id);
+                noteFromBase.Important = noteIn.Important;
+                noteFromBase.Text = noteIn.Text;
+                noteFromBase.Title = noteIn.Title;
+                context.SaveChanges();
+                return View("Index", model);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Data not valid");
+                return View();
+            }
+
+        }
+        private NotesViewModel CreateNotesViewModelToReturn()
+        {
+            return new NotesViewModel
+            {
+                Importants = null,
+                Notes = context.Notes.ToList(),
+                Users = context.Users.ToList()
+            };
         }
     }
 }
