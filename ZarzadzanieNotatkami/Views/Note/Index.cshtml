@@ -8,7 +8,7 @@
 @{
     var headerMetaData = Model.Notes?.FirstOrDefault();
     var headerForUser = Model.Users.FirstOrDefault();
-
+    
     List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
     {
         return new SelectListItem
@@ -33,13 +33,9 @@
 
 <div class="list-inline">
     <p class="list-inline-item">Sort title: </p>
-    <form asp-action="SortAsc" method="post" class="list-inline-item">
-        <button class="btn btn-primary" type="submit">Sort ascending</button>
-    </form>
+    <a asp-action="SortAsc" class="btn btn-primary">Sort ascending</a>
+    <a asp-action="SortDesc" class="btn btn-primary">Sort descending</a>
 
-    <form asp-action="SortDesc" method="post" class="list-inline-item">
-        <button class="btn btn-primary" type="submit">Sort descending</button>
-    </form>
     <div class="list-inline-item">
         <label asp-for="Users"></label>
         <select id="userSelectList" asp-items="@userListItems"></select>

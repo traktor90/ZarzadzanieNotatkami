@@ -65,7 +65,8 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult SortAsc()
         {
-            List<Note> notes = context.Notes.ToList();
+            int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
+            List<Note> notes = context.Notes.Where(n=>n.User.Id==UserId).ToList();
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
@@ -80,7 +81,8 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult SortDesc()
         {
-            List<Note> notes = context.Notes.ToList();
+            int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
+            List<Note> notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
 
@@ -160,6 +162,10 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult ChangeUser(int id)
         {
+            HttpContext.Response.Cookies.Append("UserId", id.ToString(),new Microsoft.AspNetCore.Http.CookieOptions()
+            {
+                IsEssential=true
+            });
             Models.User user = context.Users.Include(u=>u.Notes).FirstOrDefault(u => u.Id == id);
             NotesViewModel model = new NotesViewModel
             {
