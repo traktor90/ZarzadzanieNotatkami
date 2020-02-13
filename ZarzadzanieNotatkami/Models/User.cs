@@ -12,6 +12,7 @@ namespace ZarzadzanieNotatkami.Models
         public int Id { get; set; }
 
         [Required]
+        [Display(Name = "User Name")]
         public string Name { get; set; }
 
         public ICollection<Note> Notes { get; set; }

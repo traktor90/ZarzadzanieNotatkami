@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ZarzadzanieNotatkami.Models;
+using ZarzadzanieNotatkami.ViewModels;
 
 namespace ZarzadzanieNotatkami.Controllers
 {
@@ -18,7 +20,7 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult Index()
         {
             List<Note> notes=context.Notes.ToList();
-            List<User> users = context.Users.ToList();
+            List<User> users = context.Users.Include(user=>user.Notes).ToList();
 
             NotesViewModel model = CreateNotesViewModelToReturn();
             return View(model);
@@ -27,15 +29,21 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            NoteUsersViewModel model = new NoteUsersViewModel()
+            {
+                Users = context.Users.ToList()
+            };
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Create(Note note)
+        public IActionResult Create(NoteUsersViewModel noteModel)
         {
             if (ModelState.IsValid)
             {
-                context.Notes.Add(note);
+                noteModel.Note.User = context.Users.FirstOrDefault(u => u.Id == noteModel.SelectedUser);
+
+                context.Notes.Add(noteModel.Note);
                 context.SaveChanges();
 
                 NotesViewModel model = CreateNotesViewModelToReturn();
@@ -61,7 +69,12 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = CreateNotesViewModelToReturn();
+            NotesViewModel model = new NotesViewModel
+            {
+                Notes = notes,
+                Importants = null,
+                Users = users
+            };
             return View("Index", model);
         }
 
@@ -71,7 +84,12 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = CreateNotesViewModelToReturn();
+            NotesViewModel model = new NotesViewModel
+            {
+                Notes = notes,
+                Importants = null,
+                Users = users
+            };
             return View("Index", model);
         }
 
@@ -139,6 +157,20 @@ namespace ZarzadzanieNotatkami.Controllers
             }
 
         }
+
+        public IActionResult ChangeUser(int id)
+        {
+            Models.User user = context.Users.Include(u=>u.Notes).FirstOrDefault(u => u.Id == id);
+            NotesViewModel model = new NotesViewModel
+            {
+                Importants = null,
+                Notes = user.Notes?.ToList(),
+                Users = context.Users.ToList()
+            };
+
+            return View("Index",model);
+        }
+
         private NotesViewModel CreateNotesViewModelToReturn()
         {
             return new NotesViewModel

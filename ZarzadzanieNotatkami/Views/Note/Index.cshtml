@@ -5,8 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@{ 
-    var headerMetaData = Model.Notes.FirstOrDefault();
+@{
+    var headerMetaData = Model.Notes?.FirstOrDefault();
+    var headerForUser = Model.Users.FirstOrDefault();
+
     List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
     {
         return new SelectListItem
@@ -40,12 +42,15 @@
     </form>
     <div class="list-inline-item">
         <label asp-for="Users"></label>
-        <select asp-items="@userListItems" ></select>
+        <select id="userSelectList" asp-items="@userListItems"></select>
+    </div>
+    <div class="list-inline-item">
+        <a class="btn btn-primary" onclick="changeUser();">Change User</a>
     </div>
 </div>
 
 <form method="post" asp-action="Importants">
-    @for (int i = 0; i < Model.Notes.Count(); i++)
+    @for (int i = 0; i < Model.Notes.Where(note=>note!=null).Count(); i++)
     {
         @Html.HiddenFor(model => Model.Notes[i].Id);
         @Html.HiddenFor(model => Model.Notes[i].Text);
@@ -59,6 +64,9 @@
                     @Html.DisplayNameFor(model => headerMetaData.Title)
                 </th>
                 <th>Important</th>
+                <th>
+                    @Html.DisplayNameFor(model => headerForUser.Name)
+                </th>
                 <th></th>
             </tr>
         </thead>
@@ -75,6 +83,9 @@
                         <input type="checkbox" asp-for="Notes[i].Important" />
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => modelItem.Notes[i].User.Name)
+                    </td>
+                    <td>
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
@@ -89,3 +100,14 @@
         </tbody>
     </table>
 </form>
+@section Scripts{
+    <script type="text/javascript">
+        function changeUser() {
+            var userSelectList = document.getElementById("userSelectList");
+            var id = userSelectList.value;
+            location.href = '/Note/ChangeUser/' + id;
+
+        }
+
+    </script>
+}
