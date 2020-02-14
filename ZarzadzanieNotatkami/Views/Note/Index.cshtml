@@ -1,14 +1,30 @@
 ﻿@model NotesViewModel
 
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
+
 @{
     ViewData["Title"] = "Notes Managment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @{
+    string cookieHeader=httpContextAccessor.HttpContext.Response?.Headers["Set-Cookie"];
+    string userId = string.Empty;
+    if (cookieHeader!=null && cookieHeader.StartsWith("UserId"))
+    {
+        int pos1 = cookieHeader.IndexOf("=");
+        int pos2 = cookieHeader.IndexOf(";");
+        userId = cookieHeader.Substring(pos1 + 1, pos2 - pos1 - 1);
+
+    }
+    else
+    {
+        userId = (-1).ToString();
+    }
+    
     var headerMetaData = Model.Notes?.FirstOrDefault();
     var headerForUser = Model.Users.FirstOrDefault();
-    
+
     List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
     {
         return new SelectListItem
@@ -38,7 +54,9 @@
 
     <div class="list-inline-item">
         <label asp-for="Users"></label>
-        <select id="userSelectList" asp-items="@userListItems"></select>
+        <select id="userSelectList" asp-items="@userListItems" asp-for="@userId">
+            <option value="-1">All</option>
+        </select>
     </div>
     <div class="list-inline-item">
         <a class="btn btn-primary" onclick="changeUser();">Change User</a>
@@ -46,11 +64,13 @@
 </div>
 
 <form method="post" asp-action="Importants">
-    @for (int i = 0; i < Model.Notes.Where(note=>note!=null).Count(); i++)
+    @for (int i = 0; i < Model.Notes.Where(note => note != null).Count(); i++)
     {
         @Html.HiddenFor(model => Model.Notes[i].Id);
         @Html.HiddenFor(model => Model.Notes[i].Text);
         @Html.HiddenFor(model => Model.Notes[i].Title);
+        @Html.HiddenFor(model => Model.Notes[i].User);
+        @Html.HiddenFor(model => Model.Notes[i].UserId);
     }
 
     <table class="table table-hover table-striped">

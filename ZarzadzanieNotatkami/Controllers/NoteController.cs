@@ -66,7 +66,11 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult SortAsc()
         {
             int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
-            List<Note> notes = context.Notes.Where(n=>n.User.Id==UserId).ToList();
+            List<Note> notes = new List<Note>();
+            if (UserId != -1)
+                notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
+            else
+                notes = context.Notes.ToList();
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
@@ -82,7 +86,11 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult SortDesc()
         {
             int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
-            List<Note> notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
+            List<Note> notes = new List<Note>();
+            if (UserId != -1)
+                notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
+            else
+                notes = context.Notes.ToList();
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
 
@@ -105,7 +113,9 @@ namespace ZarzadzanieNotatkami.Controllers
                     Id = model.Notes[i].Id,
                     Important = model.Notes[i].Important,
                     Text = model.Notes[i].Text,
-                    Title = model.Notes[i].Title
+                    Title = model.Notes[i].Title,
+                    User = model.Notes[i].User,
+                    UserId = model.Notes[i].UserId
                 };
                 context.Notes.Update(note);
             }
@@ -136,26 +146,42 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult Edit(int id)
         {
             Note note = context.Notes.FirstOrDefault(n => n.Id == id);
-            return View(note);
+            List<User> users = context.Users.ToList();
+
+            NoteUsersViewModel model = new NoteUsersViewModel()
+            {
+                Note = note,
+                Users=users
+            };
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(Note noteIn)
+        public IActionResult Edit(NoteUsersViewModel noteIn)
         {
             NotesViewModel model = CreateNotesViewModelToReturn();
             if (ModelState.IsValid)
             {
-                Note noteFromBase = context.Notes.FirstOrDefault(n => n.Id == noteIn.Id);
-                noteFromBase.Important = noteIn.Important;
-                noteFromBase.Text = noteIn.Text;
-                noteFromBase.Title = noteIn.Title;
+                Note noteFromBase = context.Notes.FirstOrDefault(n => n.Id == noteIn.Note.Id);
+                noteFromBase.Important = noteIn.Note.Important;
+                noteFromBase.Text = noteIn.Note.Text;
+                noteFromBase.Title = noteIn.Note.Title;
+                noteFromBase.User = context.Users.FirstOrDefault(u => u.Id == noteIn.SelectedUser);
                 context.SaveChanges();
                 return View("Index", model);
             }
             else
             {
+                Note note = context.Notes.FirstOrDefault(n => n.Id == noteIn.Note.Id);
+                List<User> users = context.Users.ToList();
+
+                NoteUsersViewModel modelUsers = new NoteUsersViewModel()
+                {
+                    Note = note,
+                    Users = users
+                };
                 ModelState.AddModelError("", "Data not valid");
-                return View();
+                return View(modelUsers);
             }
 
         }
@@ -166,13 +192,28 @@ namespace ZarzadzanieNotatkami.Controllers
             {
                 IsEssential=true
             });
-            Models.User user = context.Users.Include(u=>u.Notes).FirstOrDefault(u => u.Id == id);
-            NotesViewModel model = new NotesViewModel
+            Models.User user;
+            NotesViewModel model;
+            if (id != -1)
             {
-                Importants = null,
-                Notes = user.Notes?.ToList(),
-                Users = context.Users.ToList()
-            };
+                user = context.Users.Include(u => u.Notes).FirstOrDefault(u => u.Id == id);
+                model = new NotesViewModel
+                {
+                    Importants = null,
+                    Notes = user.Notes?.ToList(),
+                    Users = context.Users.ToList()
+                };
+            }
+            else
+            {
+
+                model = new NotesViewModel
+                {
+                    Importants = null,
+                    Notes = context.Notes.ToList(),
+                    Users = context.Users.ToList()
+                };
+            }
 
             return View("Index",model);
         }
