@@ -1,7 +1,14 @@
 ﻿@model ZarzadzanieNotatkami.Models.Note
-
+@using System.Text.Encodings.Web
 @{
     ViewData["Title"] = "Details";
+
+    //prepering data to show without html tags
+    var writer = new System.IO.StringWriter();
+    Html.DisplayFor(model => model.Text).WriteTo(writer,HtmlEncoder.Default);
+    //text to show user
+    var notesText = writer.ToString();
+    notesText = System.Web.HttpUtility.HtmlDecode(notesText);
 }
 
 <h1>Details</h1>
@@ -20,7 +27,7 @@
             @Html.DisplayNameFor(model => model.Text)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Text)
+            @Html.Raw(notesText)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Important)

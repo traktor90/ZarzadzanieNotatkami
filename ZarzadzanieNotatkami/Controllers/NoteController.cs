@@ -105,7 +105,8 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Importants(NotesViewModel model)
         {
-
+            //System.Text.Encodings.Web.HtmlEncoder.Create(new System.Text.Unicode.UnicodeRange(0, 255));
+            
             for (int i = 0; i < model.Notes.Count; i++)
             {
                 Note note = new Note
