@@ -6,7 +6,7 @@ It uses ASP.NET Core MVC.
 
 You have to run **update-database** im Package Manager Console to generate Database for this program to use.
 
-If you want to create first note you have to create User first.
+If you want to create first note you have to **create User first** and change application to use it.
 
 ### How application works:
 
