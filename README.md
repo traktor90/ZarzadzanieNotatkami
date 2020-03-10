@@ -4,11 +4,11 @@ Aplikacja do zarzadzania notatkami
 This application manages notes and segregates them by users who created them.
 It uses ASP.NET Core MVC.
 
-You have to run update-database im Package Manager Console to generate Database for this program to use.
+You have to run **update-database** im Package Manager Console to generate Database for this program to use.
 
 If you want to create first note you have to create User first.
 
-###How application works:
+### How application works:
 
 If you only want to update "importants" of notes you can click "Update importants"
 
