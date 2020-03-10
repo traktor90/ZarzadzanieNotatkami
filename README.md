@@ -8,7 +8,7 @@ You have to run update-database im Package Manager Console to generate Database 
 
 If you want to create first note you have to create User first.
 
-How application works:
+###How application works:
 
 If you only want to update "importants" of notes you can click "Update importants"
 
