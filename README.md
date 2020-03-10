@@ -19,3 +19,5 @@ Application uses cookies to preserve state of chosen user.
 You can manage Users by clicking responsible for it button.
 
 You can create notes and users. For both of them there are implemented CRUD operations.
+
+##### If you want to delete user, you have to delete all of his notes first.
