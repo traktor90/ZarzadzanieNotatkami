@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    //prepraring data for select list items
     List<SelectListItem> userItems = Model.Users.ConvertAll(user =>
     {
         return new SelectListItem

@@ -22,6 +22,7 @@ namespace ZarzadzanieNotatkami.Controllers
             return View();
         }
 
+        //creating user by post method
         [HttpPost]
         public IActionResult Create(User user)
         {
@@ -36,6 +37,7 @@ namespace ZarzadzanieNotatkami.Controllers
                     Notes = context.Notes.ToList(),
                     Users = context.Users.ToList()
                 };
+                //if all is valid return main view
                 return View("~/Views/Note/Index.cshtml",model);
             }
             else
@@ -45,6 +47,7 @@ namespace ZarzadzanieNotatkami.Controllers
             }
         }
 
+        //return to manage View with all users
         public IActionResult Manage()
         {
             return View(context.Users.ToList());
@@ -75,6 +78,7 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult Edit(User userFromInput)
         {
             Models.User userFromDB = context.Users.FirstOrDefault(u => u.Id == userFromInput.Id);
+            //update user name
             userFromDB.Name = userFromInput.Name;
             context.SaveChanges();
             return View("Manage", context.Users.ToList());

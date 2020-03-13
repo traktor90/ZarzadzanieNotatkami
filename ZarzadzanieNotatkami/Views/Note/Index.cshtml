@@ -8,8 +8,10 @@
 }
 
 @{
+    //gets cookie from response sent to view
     string cookieHeader=httpContextAccessor.HttpContext.Response?.Headers["Set-Cookie"];
     string userId = string.Empty;
+    //if cookie contains userId
     if (cookieHeader!=null && cookieHeader.StartsWith("UserId"))
     {
         int pos1 = cookieHeader.IndexOf("=");
@@ -17,14 +19,17 @@
         userId = cookieHeader.Substring(pos1 + 1, pos2 - pos1 - 1);
 
     }
+    //if not then select all users
     else
     {
         userId = (-1).ToString();
     }
     
+    //objects containing title for note and user
     var headerMetaData = Model.Notes?.FirstOrDefault();
     var headerForUser = Model.Users.FirstOrDefault();
 
+    //object containg all users for ddl
     List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
     {
         return new SelectListItem
@@ -64,6 +69,7 @@
 </div>
 
 <form method="post" asp-action="Importants">
+    @* Needed later for importants actualization in Importants action *@
     @for (int i = 0; i < Model.Notes.Where(note => note != null).Count(); i++)
     {
         @Html.HiddenFor(model => Model.Notes[i].Id);
@@ -120,7 +126,9 @@
     <script type="text/javascript">
         function changeUser() {
             var userSelectList = document.getElementById("userSelectList");
+            //selected id of selected user
             var id = userSelectList.value;
+            //get to ChangeUser action in Note controller
             location.href = '/Note/ChangeUser/' + id;
 
         }
