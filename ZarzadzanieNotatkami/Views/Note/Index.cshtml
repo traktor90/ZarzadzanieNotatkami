@@ -1,28 +1,17 @@
 ﻿@model NotesViewModel
 
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor
-
 @{
     ViewData["Title"] = "Notes Managment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @{
-   
+
 
     //objects containing title for note and user
     var headerMetaData = Model.Notes?.FirstOrDefault();
     var headerForUser = Model.Users.FirstOrDefault();
 
-    //object containg all users for ddl
-    List<SelectListItem> userListItems = Model.Users.ConvertAll(user =>
-    {
-        return new SelectListItem
-        {
-            Text = user.Name,
-            Value = user.Id.ToString()
-        };
-    });
 }
 
 <h1>Notes Manager</h1>
@@ -44,7 +33,7 @@
 
     <div class="list-inline-item">
         <label asp-for="Users"></label>
-        <select id="userSelectList" asp-items="@userListItems" asp-for="@Model.UserId">
+        <select id="userSelectList" asp-items="@Model.UserListItems" asp-for="@Model.UserId">
             <option value="-1">All</option>
         </select>
     </div>

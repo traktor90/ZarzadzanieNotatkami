@@ -8,6 +8,7 @@ namespace ZarzadzanieNotatkami.Models
 {
     public class NotesViewModel
     {
+        public List<SelectListItem> UserListItems { get; set; }
         public int UserId { get; set; }
         public List<Note> Notes { get; set; }
         public List<bool> Importants { get; set; }

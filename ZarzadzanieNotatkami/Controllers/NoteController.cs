@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ZarzadzanieNotatkami.Models;
@@ -25,14 +26,16 @@ namespace ZarzadzanieNotatkami.Controllers
             List<Note> notes=context.Notes.ToList();
             List<User> users = context.Users.Include(user=>user.Notes).ToList();
 
-            NotesViewModel model = CreateNotesViewModelToReturn();
 
             var userId = HttpContext.Request.Cookies["UserId"];
             int userIdInt;
             bool userIdOk = int.TryParse(userId,out userIdInt);
             if (!userIdOk)
                 return RedirectToAction("Index");
+
+            NotesViewModel model = CreateNotesViewModelToReturn(userIdInt);
             model.UserId = userIdInt;
+
 
             return View(model);
         }
@@ -57,7 +60,7 @@ namespace ZarzadzanieNotatkami.Controllers
                 context.Notes.Add(noteModel.Note);
                 context.SaveChanges();
 
-                NotesViewModel model = CreateNotesViewModelToReturn();
+                NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
                 return View("Index",model);
             }
             else
@@ -91,12 +94,7 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = new NotesViewModel
-            {
-                Notes = notes,
-                Importants = null,
-                Users = users
-            };
+            NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
             return View("Index", model);
         }
 
@@ -116,12 +114,8 @@ namespace ZarzadzanieNotatkami.Controllers
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
 
-            NotesViewModel model = new NotesViewModel
-            {
-                Notes = notes,
-                Importants = null,
-                Users = users
-            };
+            NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
+
             return View("Index", model);
         }
 
@@ -165,7 +159,7 @@ namespace ZarzadzanieNotatkami.Controllers
             context.SaveChanges();
             
             var listNotes = context.Notes.ToList();
-            NotesViewModel modelToReturn = CreateNotesViewModelToReturn();
+            NotesViewModel modelToReturn = CreateNotesViewModelToReturn(allNotesSelected);
             return View("Index",modelToReturn);
         }
 
@@ -181,7 +175,7 @@ namespace ZarzadzanieNotatkami.Controllers
             //remove this note with above id
             context.Notes.Remove(note);
             context.SaveChanges();
-            NotesViewModel model = CreateNotesViewModelToReturn();
+            NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
             return View("Index", model);
         }
 
@@ -203,7 +197,7 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpPost]
         public IActionResult Edit(NoteUsersViewModel noteIn)
         {
-            NotesViewModel model = CreateNotesViewModelToReturn();
+            NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
             if (ModelState.IsValid)
             {
                 //get note with id from ViewModel
@@ -248,37 +242,47 @@ namespace ZarzadzanieNotatkami.Controllers
             {
                 //include notes db into users db and select user with given id
                 user = context.Users.Include(u => u.Notes).FirstOrDefault(u => u.Id == id);
-                model = new NotesViewModel
-                {
-                    Importants = null,
-                    Notes = user.Notes?.ToList(),
-                    Users = context.Users.ToList()
-                };
+                model = CreateNotesViewModelToReturn(id);
+                model.UserId = id;
             }
             //if all user option is selected
             else
             {
 
-                model = new NotesViewModel
-                {
-                    Importants = null,
-                    Notes = context.Notes.ToList(),
-                    Users = context.Users.ToList()
-                };
+                model = CreateNotesViewModelToReturn(allNotesSelected);
             }
 
             return View("Index",model);
         }
 
         //preparing ViewModel so it can be returned
-        private NotesViewModel CreateNotesViewModelToReturn()
+        private NotesViewModel CreateNotesViewModelToReturn(int userId)
         {
-            return new NotesViewModel
+            List<SelectListItem> userListItems = context.Users.ToList().ConvertAll(user =>
             {
-                Importants = null,
-                Notes = context.Notes.ToList(),
-                Users = context.Users.ToList()
-            };
+                return new SelectListItem
+                {
+                    Text = user.Name,
+                    Value = user.Id.ToString()
+                };
+            });
+            
+            if(userId!=allNotesSelected)
+                return new NotesViewModel
+                {
+                    Importants = null,
+                    Notes = context.Notes.Where(n=>n.UserId==userId).ToList(),
+                    Users = context.Users.ToList(),
+                    UserListItems=userListItems
+                };
+            else
+                return new NotesViewModel
+                {
+                    Importants = null,
+                    Notes = context.Notes.ToList(),
+                    Users = context.Users.ToList(),
+                    UserListItems = userListItems
+                };
         }
     }
 }
