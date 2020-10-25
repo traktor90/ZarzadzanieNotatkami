@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,8 @@ namespace ZarzadzanieNotatkami.Controllers
     public class NoteController : Controller
     {
         NotesDBContext context;
+        const int allNotesSelected = -1;
+
         public NoteController(NotesDBContext context)
         {
             this.context = context;
@@ -23,6 +26,14 @@ namespace ZarzadzanieNotatkami.Controllers
             List<User> users = context.Users.Include(user=>user.Notes).ToList();
 
             NotesViewModel model = CreateNotesViewModelToReturn();
+
+            var userId = HttpContext.Request.Cookies["UserId"];
+            int userIdInt;
+            bool userIdOk = int.TryParse(userId,out userIdInt);
+            if (!userIdOk)
+                return RedirectToAction("Index");
+            model.UserId = userIdInt;
+
             return View(model);
         }
 
@@ -66,16 +77,17 @@ namespace ZarzadzanieNotatkami.Controllers
         //sort notes ascending
         public IActionResult SortAsc()
         {
-            //get userId from cookie
-            int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
             List<Note> notes = new List<Note>();
-            
-            //if user is selected
-            if (UserId != -1)
-                notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
-            //if all user is selected
-            else
-                notes = context.Notes.ToList();
+
+            try
+            {
+                notes = GetUserNotes();
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("Index");
+            }
+
             notes.Sort((x, y) => x.Title.CompareTo(y.Title));
             List<User> users = context.Users.ToList();
 
@@ -91,15 +103,15 @@ namespace ZarzadzanieNotatkami.Controllers
         //sort notes descending
         public IActionResult SortDesc()
         {
-            //get userId from cookie
-            int UserId = int.Parse(HttpContext.Request.Cookies["UserId"]);
             List<Note> notes = new List<Note>();
-            //if user is selected
-            if (UserId != -1)
-                notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
-            //if all user option is selected
-            else
-                notes = context.Notes.ToList();
+
+            try
+            {
+                notes = GetUserNotes();
+            }catch(Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
             //sort notes by title
             notes.Sort((x, y) => y.Title.CompareTo(x.Title));
             List<User> users = context.Users.ToList();
@@ -111,6 +123,25 @@ namespace ZarzadzanieNotatkami.Controllers
                 Users = users
             };
             return View("Index", model);
+        }
+
+        private List<Note> GetUserNotes()
+        {
+            List<Note> notes;
+
+            int UserId;
+            bool cookieExist = int.TryParse(HttpContext.Request.Cookies["UserId"], out UserId);
+
+            if (!cookieExist)
+                throw new Exception("User cookie does not exist");
+
+            //if user is selected
+            if (UserId != allNotesSelected)
+                notes = context.Notes.Where(n => n.User.Id == UserId).ToList();
+            //if all user option is selected
+            else
+                notes = context.Notes.ToList();
+            return notes;
         }
 
         public IActionResult Importants(NotesViewModel model)

@@ -8,23 +8,8 @@
 }
 
 @{
-    //gets cookie from response sent to view
-    string cookieHeader=httpContextAccessor.HttpContext.Response?.Headers["Set-Cookie"];
-    string userId = string.Empty;
-    //if cookie contains userId
-    if (cookieHeader!=null && cookieHeader.StartsWith("UserId"))
-    {
-        int pos1 = cookieHeader.IndexOf("=");
-        int pos2 = cookieHeader.IndexOf(";");
-        userId = cookieHeader.Substring(pos1 + 1, pos2 - pos1 - 1);
+   
 
-    }
-    //if not then select all users
-    else
-    {
-        userId = (-1).ToString();
-    }
-    
     //objects containing title for note and user
     var headerMetaData = Model.Notes?.FirstOrDefault();
     var headerForUser = Model.Users.FirstOrDefault();
@@ -59,7 +44,7 @@
 
     <div class="list-inline-item">
         <label asp-for="Users"></label>
-        <select id="userSelectList" asp-items="@userListItems" asp-for="@userId">
+        <select id="userSelectList" asp-items="@userListItems" asp-for="@Model.UserId">
             <option value="-1">All</option>
         </select>
     </div>
