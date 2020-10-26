@@ -25,8 +25,19 @@ namespace ZarzadzanieNotatkami.Controllers
         {
             List<Note> notes = context.Notes.ToList();
             List<User> users = context.Users.Include(user => user.Notes).ToList();
+            NotesViewModel model = PrepareModelWithUserId();
 
+            //sample objects needed to render titles for user and note
+            var headerForNote = context.Notes?.FirstOrDefault();
+            var headerForUser = context.Users.FirstOrDefault();
 
+            model.HeaderForNote = headerForNote;
+            model.HeaderForUser = headerForUser;
+            return View(model);
+        }
+
+        private NotesViewModel PrepareModelWithUserId()
+        {
             var userId = HttpContext.Request.Cookies["UserId"];
             int userIdInt;
             bool userIdOk = int.TryParse(userId, out userIdInt);
@@ -42,13 +53,8 @@ namespace ZarzadzanieNotatkami.Controllers
                 model.UserId = userIdInt;
 
             }
-            //sample objects needed to render titles for user and note
-            var headerForNote = context.Notes?.FirstOrDefault();
-            var headerForUser = context.Users.FirstOrDefault();
 
-            model.HeaderForNote = headerForNote;
-            model.HeaderForUser= headerForUser;
-            return View(model);
+            return model;
         }
 
         [HttpGet]
@@ -152,26 +158,32 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult Importants(NotesViewModel model)
         {
             //do this for every note
-            for (int i = 0; i < model.Notes.Count; i++)
+            for (int noteIndex = 0; noteIndex < model.Notes.Count; noteIndex++)
             {
-                Note note = new Note
-                {
-                    Id = model.Notes[i].Id,
-                    //specifically only this field is updating
-                    Important = model.Notes[i].Important,
-                    Text = model.Notes[i].Text,
-                    Title = model.Notes[i].Title,
-                    User = model.Notes[i].User,
-                    UserId = model.Notes[i].UserId
-                };
+                Note note = PrepareNote(model, noteIndex);
                 context.Notes.Update(note);
             }
-            
+
             context.SaveChanges();
             
             var listNotes = context.Notes.ToList();
             NotesViewModel modelToReturn = CreateNotesViewModelToReturn(allNotesSelected);
             return View("Index",modelToReturn);
+        }
+
+        private static Note PrepareNote(NotesViewModel model, int noteIndex)
+        {
+            Note note = new Note
+            {
+                Id = model.Notes[noteIndex].Id,
+                //specifically only this field is updating
+                Important = model.Notes[noteIndex].Important,
+                Text = model.Notes[noteIndex].Text,
+                Title = model.Notes[noteIndex].Title,
+                User = model.Notes[noteIndex].User,
+                UserId = model.Notes[noteIndex].UserId
+            };
+            return note;
         }
 
         public IActionResult CreateUser()
