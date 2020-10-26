@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -60,11 +62,24 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            NoteUsersViewModel model = new NoteUsersViewModel()
-            {
-                Users = context.Users.ToList()
-            };
+            NoteUsersViewModel model = PrepareModelForCreate();
             return View(model);
+        }
+
+        private NoteUsersViewModel PrepareModelForCreate()
+        {
+            return new NoteUsersViewModel()
+            {
+                Users = context.Users.ToList(),
+                userItems = context.Users.ToList().ConvertAll(user =>
+                {
+                    return new SelectListItem
+                    {
+                        Text = user.Name,
+                        Value = user.Id.ToString()
+                    };
+                })
+            };
         }
 
         [HttpPost]
@@ -91,6 +106,7 @@ namespace ZarzadzanieNotatkami.Controllers
         public IActionResult Details(int id)
         {
             Note note = context.Notes.FirstOrDefault(n => n.Id == id);
+
             return View(note);
         }
 
@@ -206,15 +222,30 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            NoteUsersViewModel model = PrepareModelForEdit(id);
+
+            return View(model);
+        }
+
+        private NoteUsersViewModel PrepareModelForEdit(int id)
+        {
             Note note = context.Notes.FirstOrDefault(n => n.Id == id);
             List<User> users = context.Users.ToList();
 
             NoteUsersViewModel model = new NoteUsersViewModel()
             {
                 Note = note,
-                Users=users
+                Users = users,
+                userItems = context.Users.ToList().ConvertAll(user =>
+                {
+                    return new SelectListItem
+                    {
+                        Text = user.Name,
+                        Value = user.Id.ToString()
+                    };
+                })
             };
-            return View(model);
+            return model;
         }
 
         [HttpPost]

@@ -3,13 +3,6 @@
 @{
     ViewData["Title"] = "Details";
 
-    //prepering data to show without html tags, it interprets them and show it to user 
-    var writer = new System.IO.StringWriter();
-    Html.DisplayFor(model => model.Text).WriteTo(writer,HtmlEncoder.Default);
-    //text to show user
-    var notesText = writer.ToString();
-    //interpret html tags, e.g. <b></b> is shown in bold insted of showing tags
-    notesText = System.Web.HttpUtility.HtmlDecode(notesText);
 }
 
 <h1>Details</h1>
@@ -28,7 +21,7 @@
             @Html.DisplayNameFor(model => model.Text)
         </dt>
         <dd class="col-sm-10">
-            @Html.Raw(notesText)
+            @Html.Raw(Model.Text)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Important)

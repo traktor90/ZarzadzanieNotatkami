@@ -2,16 +2,6 @@
 
 @{
     ViewData["Title"] = "Edit";
-    //this is for selecting user for note
-    //it returns all users so user can select appropriate user
-    List<SelectListItem> userItems = Model.Users.ConvertAll(user =>
-    {
-        return new SelectListItem
-        {
-            Text = user.Name,
-            Value = user.Id.ToString()
-        };
-    });
 }
 
 <h1>Edit</h1>
@@ -44,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Note.User.Name"></label>
-                <select asp-items="userItems" asp-for="SelectedUser"></select>
+                <select asp-items="Model.userItems" asp-for="SelectedUser"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
