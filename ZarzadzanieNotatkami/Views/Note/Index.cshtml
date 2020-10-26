@@ -8,9 +8,9 @@
 @{
 
 
-    //objects containing title for note and user
-    var headerMetaData = Model.Notes?.FirstOrDefault();
-    var headerForUser = Model.Users.FirstOrDefault();
+////objects containing title for note and user
+//var headerMetaData = Model.Notes?.FirstOrDefault();
+//var headerForUser = Model.Users.FirstOrDefault();
 
 }
 
@@ -57,11 +57,11 @@
         <thead>
             <tr>
                 <th style="width:auto;">
-                    @Html.DisplayNameFor(model => headerMetaData.Title)
+                    @Html.DisplayNameFor(model => Model.HeaderForNote.Title)
                 </th>
                 <th>Important</th>
                 <th>
-                    @Html.DisplayNameFor(model => headerForUser.Name)
+                    @Html.DisplayNameFor(model => Model.HeaderForUser.Name)
                 </th>
                 <th></th>
             </tr>

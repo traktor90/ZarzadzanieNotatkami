@@ -13,5 +13,7 @@ namespace ZarzadzanieNotatkami.Models
         public List<Note> Notes { get; set; }
         public List<bool> Importants { get; set; }
         public List<User> Users { get; set; }
+        public Note HeaderForNote { get; set; }
+        public Models.User HeaderForUser { get; set; }
     }
 }

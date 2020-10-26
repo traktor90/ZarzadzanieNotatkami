@@ -23,20 +23,31 @@ namespace ZarzadzanieNotatkami.Controllers
         }
         public IActionResult Index()
         {
-            List<Note> notes=context.Notes.ToList();
-            List<User> users = context.Users.Include(user=>user.Notes).ToList();
+            List<Note> notes = context.Notes.ToList();
+            List<User> users = context.Users.Include(user => user.Notes).ToList();
 
 
             var userId = HttpContext.Request.Cookies["UserId"];
             int userIdInt;
-            bool userIdOk = int.TryParse(userId,out userIdInt);
-            if (!userIdOk)
-                return RedirectToAction("Index");
+            bool userIdOk = int.TryParse(userId, out userIdInt);
+            NotesViewModel model;
+            if (userIdOk)
+            {
+                model = CreateNotesViewModelToReturn(userIdInt);
+                model.UserId = userIdInt;
+            }
+            else
+            {
+                model = CreateNotesViewModelToReturn(allNotesSelected);
+                model.UserId = userIdInt;
 
-            NotesViewModel model = CreateNotesViewModelToReturn(userIdInt);
-            model.UserId = userIdInt;
+            }
+            //sample objects needed to render titles for user and note
+            var headerForNote = context.Notes?.FirstOrDefault();
+            var headerForUser = context.Users.FirstOrDefault();
 
-
+            model.HeaderForNote = headerForNote;
+            model.HeaderForUser= headerForUser;
             return View(model);
         }
 
