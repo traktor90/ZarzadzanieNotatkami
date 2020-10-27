@@ -26,7 +26,9 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpPost]
         public IActionResult Create(User user)
         {
-            
+            if (user == null)
+                throw new ArgumentNullException("User cannot be null");
+
             if (ModelState.IsValid)
             {
                 context.Users.Add(user);
@@ -55,6 +57,9 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Delete(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("User id cannot be less than zero");
+
             Models.User user = context.Users.FirstOrDefault(u=>u.Id==id);
             context.Users.Remove(user);
             context.SaveChanges();
@@ -63,6 +68,9 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Details(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("User id cannot be less than zero");
+
             Models.User user = context.Users.FirstOrDefault(u => u.Id == id);
             return View(user);
         }
@@ -70,6 +78,9 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("User id cannot be less than zero");
+
             var user = context.Users.FirstOrDefault(u => u.Id == id);
             return View(user);
         }
@@ -77,6 +88,9 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpPost]
         public IActionResult Edit(User userFromInput)
         {
+            if (userFromInput == null)
+                throw new ArgumentNullException("Userfrominput cannot be null");
+
             Models.User userFromDB = context.Users.FirstOrDefault(u => u.Id == userFromInput.Id);
             //update user name
             userFromDB.Name = userFromInput.Name;

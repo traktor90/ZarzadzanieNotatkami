@@ -85,6 +85,9 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpPost]
         public IActionResult Create(NoteUsersViewModel noteModel)
         {
+            if (noteModel == null)
+                throw new ArgumentNullException("ViewModel cannot be null");
+
             if (ModelState.IsValid)
             {
                 noteModel.Note.User = context.Users.FirstOrDefault(u => u.Id == noteModel.SelectedUser);
@@ -105,6 +108,8 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Details(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("Note id cannot be less than zero");
             Note note = context.Notes.FirstOrDefault(n => n.Id == id);
 
             return View(note);
@@ -173,6 +178,9 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Importants(NotesViewModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException("View model cannot be null");
+
             //do this for every note
             for (int noteIndex = 0; noteIndex < model.Notes.Count; noteIndex++)
             {
@@ -189,6 +197,11 @@ namespace ZarzadzanieNotatkami.Controllers
 
         private static Note PrepareNote(NotesViewModel model, int noteIndex)
         {
+            if (model == null)
+                throw new ArgumentNullException("ViewModel cannot be null");
+            if (noteIndex < 0)
+                throw new ArgumentOutOfRangeException("Wrong id of Note");
+
             Note note = new Note
             {
                 Id = model.Notes[noteIndex].Id,
@@ -209,6 +222,8 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult Delete(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("Wrong note id");
             //get note with this id
             Note note = context.Notes.FirstOrDefault(n => n.Id == id);
             //remove this note with above id
@@ -222,14 +237,20 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            if (id < 0)
+                throw new ArgumentOutOfRangeException("Wrong noteId");
+
             NoteUsersViewModel model = PrepareModelForEdit(id);
 
             return View(model);
         }
 
-        private NoteUsersViewModel PrepareModelForEdit(int id)
+        private NoteUsersViewModel PrepareModelForEdit(int noteId)
         {
-            Note note = context.Notes.FirstOrDefault(n => n.Id == id);
+            if (noteId < 0)
+                throw new ArgumentOutOfRangeException("Note id is wrong");
+
+            Note note = context.Notes.FirstOrDefault(n => n.Id == noteId);
             List<User> users = context.Users.ToList();
 
             NoteUsersViewModel model = new NoteUsersViewModel()
@@ -251,6 +272,9 @@ namespace ZarzadzanieNotatkami.Controllers
         [HttpPost]
         public IActionResult Edit(NoteUsersViewModel noteIn)
         {
+            if (noteIn == null)
+                throw new ArgumentNullException("View model cannot be null");
+
             NotesViewModel model = CreateNotesViewModelToReturn(allNotesSelected);
             if (ModelState.IsValid)
             {
@@ -283,6 +307,9 @@ namespace ZarzadzanieNotatkami.Controllers
 
         public IActionResult ChangeUser(int id)
         {
+            if (id < -1)
+                throw new ArgumentOutOfRangeException("UserId is wrong");
+
             //add cookie with selected user
             HttpContext.Response.Cookies.Append("UserId", id.ToString(),new Microsoft.AspNetCore.Http.CookieOptions()
             {
@@ -312,6 +339,9 @@ namespace ZarzadzanieNotatkami.Controllers
         //preparing ViewModel so it can be returned
         private NotesViewModel CreateNotesViewModelToReturn(int userId)
         {
+            if (userId < -1)
+                throw new ArgumentOutOfRangeException("UserId is wrong");
+
             List<SelectListItem> userListItems = context.Users.ToList().ConvertAll(user =>
             {
                 return new SelectListItem
